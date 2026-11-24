@@ -1,0 +1,13 @@
+build/
+cmake-build-*/
+*.pro.user*
+*.autosave
+*.exe
+*.o
+*.obj
+moc_*
+qrc_*
+ui_*
+dados/
+*.csv
+export_*.txt
