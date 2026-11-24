@@ -18,6 +18,8 @@ set(FONTES_PROJETO
     model/Cliente.cpp
     model/TiposHotel.h
     model/TiposHotel.cpp
+    model/EstrategiaDesconto.h
+    model/EstrategiaDesconto.cpp
     model/Reserva.h
     model/Reserva.cpp
 )
