@@ -30,6 +30,10 @@ set(FONTES_PROJETO
     ui/TelaLogin.cpp
     ui/TelaPrincipal.h
     ui/TelaPrincipal.cpp
+    ui/TelaReserva.h
+    ui/TelaReserva.cpp
+    ui/TelaResumoReserva.h
+    ui/TelaResumoReserva.cpp
 )
 
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})

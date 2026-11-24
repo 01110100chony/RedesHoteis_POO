@@ -16,7 +16,9 @@ HEADERS += \
     core/GerenciadorReservas.h \
     core/PersistenciaArquivo.h \
     ui/TelaLogin.h \
-    ui/TelaPrincipal.h
+    ui/TelaPrincipal.h \
+    ui/TelaReserva.h \
+    ui/TelaResumoReserva.h
 
 SOURCES += \
     main.cpp \
@@ -29,4 +31,6 @@ SOURCES += \
     core/GerenciadorReservas.cpp \
     core/PersistenciaArquivo.cpp \
     ui/TelaLogin.cpp \
-    ui/TelaPrincipal.cpp
+    ui/TelaPrincipal.cpp \
+    ui/TelaReserva.cpp \
+    ui/TelaResumoReserva.cpp

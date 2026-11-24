@@ -1,4 +1,5 @@
 #include "TelaPrincipal.h"
+#include "TelaReserva.h"
 #include "core/GerenciadorReservas.h"
 
 #include <QFrame>
@@ -136,7 +137,9 @@ void TelaPrincipal::atualizarResumoPainel()
 
 void TelaPrincipal::abrirTelaReserva()
 {
-    QMessageBox::information(this, "Em desenvolvimento", "A tela de reserva será conectada no próximo passo.");
+    TelaReserva tela(this);
+    tela.exec();
+    atualizarResumoPainel();
 }
 
 void TelaPrincipal::abrirTelaListagem()
