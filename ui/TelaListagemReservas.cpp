@@ -16,7 +16,7 @@ TelaListagemReservas::TelaListagemReservas(QWidget* parent)
     : QDialog(parent)
 {
     setWindowTitle("Listagem de Reservas - Hotéis Paradise");
-    setMinimumSize(1020, 540);
+    setMinimumSize(1180, 560);
 
     auto* layoutPrincipal = new QVBoxLayout(this);
     layoutPrincipal->setContentsMargins(18, 18, 18, 18);
@@ -66,6 +66,8 @@ TelaListagemReservas::TelaListagemReservas(QWidget* parent)
     tabelaReservas->verticalHeader()->setVisible(false);
     tabelaReservas->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     tabelaReservas->horizontalHeader()->setSectionResizeMode(6, QHeaderView::Stretch);
+    tabelaReservas->horizontalHeader()->setSectionResizeMode(8, QHeaderView::Interactive);
+    tabelaReservas->setColumnWidth(8, 175);
     tabelaReservas->horizontalHeader()->setSectionResizeMode(11, QHeaderView::ResizeToContents);
 
     layoutPrincipal->addWidget(tabelaReservas);
@@ -154,7 +156,7 @@ void TelaListagemReservas::carregarTabela()
         tabelaReservas->setItem(row, 3, criarItem(QString::number(r.getNumDiarias()), Qt::AlignCenter));
         tabelaReservas->setItem(row, 4, criarItem(InfoHotel::unidadeParaTexto(r.getUnidade())));
         tabelaReservas->setItem(row, 5, criarItem(InfoHotel::tipoQuartoParaTexto(r.getTipoQuarto())));
-        tabelaReservas->setItem(row, 6, criarItem(r.getCliente().getResumoIdentificacao()));
+        tabelaReservas->setItem(row, 6, criarItem(r.getCliente().getNome()));
         tabelaReservas->setItem(row, 7, criarItem(r.getNomeAtendente()));
         tabelaReservas->setItem(row, 8, criarItem(QString("%1 (%2%)")
                                                       .arg(r.getNomePoliticaDesconto())

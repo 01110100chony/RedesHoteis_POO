@@ -16,7 +16,7 @@ TelaReserva::TelaReserva(QWidget* parent)
     : QDialog(parent)
 {
     setWindowTitle("Consulta de Disponibilidade e Reserva - Hotéis Paradise");
-    setMinimumSize(680, 620);
+    setMinimumSize(720, 660);
 
     auto* layoutPrincipal = new QVBoxLayout(this);
     layoutPrincipal->setContentsMargins(20, 18, 20, 18);
@@ -65,6 +65,7 @@ TelaReserva::TelaReserva(QWidget* parent)
 
     lblStatusDisponibilidade = new QLabel("Clique em 'Consultar Disponibilidade' para verificar o período.", grupoPeriodo);
     lblStatusDisponibilidade->setWordWrap(true);
+    lblStatusDisponibilidade->setMinimumHeight(34);
     lblStatusDisponibilidade->setStyleSheet("padding: 8px; border-radius: 4px; background-color: #f1f5f9; color: #334e68;");
 
     gridPeriodo->addWidget(new QLabel("Unidade:", grupoPeriodo), 0, 0);

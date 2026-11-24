@@ -11,7 +11,12 @@ static QString estiloPadraoSistema()
             font-family: "Segoe UI", Arial, sans-serif;
             font-size: 13px;
             color: #1f2933;
+        }
+        QMainWindow, QDialog {
             background-color: #f4f7fa;
+        }
+        QLabel, QCheckBox {
+            background-color: transparent;
         }
         QLabel#tituloPrincipal {
             font-size: 20px;
@@ -27,21 +32,22 @@ static QString estiloPadraoSistema()
             color: #0d3b66;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
-            margin-top: 10px;
-            padding: 12px;
+            margin-top: 12px;
+            padding: 18px 12px 12px 12px;
             background-color: #ffffff;
         }
         QGroupBox::title {
             subcontrol-origin: margin;
-            left: 10px;
+            left: 12px;
             padding: 0 6px;
+            background-color: #f4f7fa;
         }
         QLineEdit, QComboBox, QDateEdit, QSpinBox {
             background-color: #ffffff;
             border: 1px solid #bcccdc;
             border-radius: 4px;
-            padding: 6px 8px;
-            min-height: 22px;
+            padding: 5px 8px;
+            min-height: 24px;
         }
         QLineEdit:focus, QComboBox:focus, QDateEdit:focus, QSpinBox:focus {
             border: 1px solid #1976d2;
@@ -51,6 +57,7 @@ static QString estiloPadraoSistema()
             border: 1px solid #cbd5e1;
             border-radius: 5px;
             padding: 7px 14px;
+            min-height: 22px;
             font-weight: 600;
             color: #1f2933;
         }
