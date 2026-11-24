@@ -26,6 +26,10 @@ set(FONTES_PROJETO
     core/GerenciadorReservas.cpp
     core/PersistenciaArquivo.h
     core/PersistenciaArquivo.cpp
+    ui/TelaLogin.h
+    ui/TelaLogin.cpp
+    ui/TelaPrincipal.h
+    ui/TelaPrincipal.cpp
 )
 
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})

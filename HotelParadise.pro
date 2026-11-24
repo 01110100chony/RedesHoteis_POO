@@ -14,7 +14,9 @@ HEADERS += \
     model/EstrategiaDesconto.h \
     model/Reserva.h \
     core/GerenciadorReservas.h \
-    core/PersistenciaArquivo.h
+    core/PersistenciaArquivo.h \
+    ui/TelaLogin.h \
+    ui/TelaPrincipal.h
 
 SOURCES += \
     main.cpp \
@@ -25,4 +27,6 @@ SOURCES += \
     model/EstrategiaDesconto.cpp \
     model/Reserva.cpp \
     core/GerenciadorReservas.cpp \
-    core/PersistenciaArquivo.cpp
+    core/PersistenciaArquivo.cpp \
+    ui/TelaLogin.cpp \
+    ui/TelaPrincipal.cpp
