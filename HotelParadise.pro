@@ -6,5 +6,13 @@ TEMPLATE = app
 
 INCLUDEPATH += $$PWD
 
+HEADERS += \
+    model/Pessoa.h \
+    model/Atendente.h \
+    model/Cliente.h
+
 SOURCES += \
-    main.cpp
+    main.cpp \
+    model/Pessoa.cpp \
+    model/Atendente.cpp \
+    model/Cliente.cpp

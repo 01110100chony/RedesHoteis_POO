@@ -10,6 +10,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(FONTES_PROJETO
     main.cpp
+    model/Pessoa.h
+    model/Pessoa.cpp
+    model/Atendente.h
+    model/Atendente.cpp
+    model/Cliente.h
+    model/Cliente.cpp
 )
 
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})
