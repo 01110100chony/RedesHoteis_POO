@@ -26,7 +26,11 @@ bool PersistenciaArquivo::salvarClientesCsv(const QString& caminho, const QList<
     arquivo.write("\xEF\xBB\xBF");
 
     QTextStream out(&arquivo);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     out.setEncoding(QStringConverter::Utf8);
+#else
+    out.setCodec("UTF-8");
+#endif
     out << "nome;cpf\n";
 
     for (const Cliente& c : clientes) {
@@ -46,7 +50,11 @@ QList<Cliente> PersistenciaArquivo::carregarClientesCsv(const QString& caminho)
     }
 
     QTextStream in(&arquivo);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     in.setEncoding(QStringConverter::Utf8);
+#else
+    in.setCodec("UTF-8");
+#endif
 
     bool primeiraLinha = true;
     while (!in.atEnd()) {
@@ -88,7 +96,11 @@ bool PersistenciaArquivo::salvarReservasCsv(const QString& caminho, const QList<
     arquivo.write("\xEF\xBB\xBF");
 
     QTextStream out(&arquivo);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     out.setEncoding(QStringConverter::Utf8);
+#else
+    out.setCodec("UTF-8");
+#endif
     out << "id;atendente_usuario;atendente_nome;cliente_nome;cliente_cpf;unidade;quarto;check_in;check_out;diarias;politica_desconto;percentual_desconto;valor_diaria;valor_bruto;valor_desconto;valor_total;valor_entrada;status\n";
 
     for (const Reserva& r : reservasOrdenadas) {
@@ -124,7 +136,11 @@ QList<Reserva> PersistenciaArquivo::carregarReservasCsv(const QString& caminho)
     }
 
     QTextStream in(&arquivo);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     in.setEncoding(QStringConverter::Utf8);
+#else
+    in.setCodec("UTF-8");
+#endif
 
     bool primeiraLinha = true;
     while (!in.atEnd()) {
@@ -199,7 +215,11 @@ bool PersistenciaArquivo::exportarReservasTxt(const QString& caminho, const QLis
     }
 
     QTextStream out(&arquivo);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     out.setEncoding(QStringConverter::Utf8);
+#else
+    out.setCodec("UTF-8");
+#endif
 
     out << "============================================================\n";
     out << "REDE DE HOTÉIS PARADISE - RELATÓRIO DE RESERVAS\n";

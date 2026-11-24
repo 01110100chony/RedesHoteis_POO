@@ -8,8 +8,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
-set(FONTES_PROJETO
-    main.cpp
+set(FONTES_DOMINIO
     model/Pessoa.h
     model/Pessoa.cpp
     model/Atendente.h
@@ -26,6 +25,11 @@ set(FONTES_PROJETO
     core/GerenciadorReservas.cpp
     core/PersistenciaArquivo.h
     core/PersistenciaArquivo.cpp
+)
+
+set(FONTES_PROJETO
+    main.cpp
+    ${FONTES_DOMINIO}
     ui/TelaLogin.h
     ui/TelaLogin.cpp
     ui/TelaPrincipal.h
@@ -42,8 +46,14 @@ add_executable(HotelParadise WIN32 ${FONTES_PROJETO})
 target_include_directories(HotelParadise PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(HotelParadise PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
+add_executable(teste_regras tests/teste_regras.cpp ${FONTES_DOMINIO})
+target_include_directories(teste_regras PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(teste_regras PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+
 if(MSVC)
     target_compile_options(HotelParadise PRIVATE /utf-8)
+    target_compile_options(teste_regras PRIVATE /utf-8)
 elseif(MINGW OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(HotelParadise PRIVATE -finput-charset=UTF-8 -fexec-charset=UTF-8)
+    target_compile_options(teste_regras PRIVATE -finput-charset=UTF-8 -fexec-charset=UTF-8)
 endif()
