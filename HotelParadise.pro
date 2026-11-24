@@ -18,7 +18,8 @@ HEADERS += \
     ui/TelaLogin.h \
     ui/TelaPrincipal.h \
     ui/TelaReserva.h \
-    ui/TelaResumoReserva.h
+    ui/TelaResumoReserva.h \
+    ui/TelaListagemReservas.h
 
 SOURCES += \
     main.cpp \
@@ -33,4 +34,5 @@ SOURCES += \
     ui/TelaLogin.cpp \
     ui/TelaPrincipal.cpp \
     ui/TelaReserva.cpp \
-    ui/TelaResumoReserva.cpp
+    ui/TelaResumoReserva.cpp \
+    ui/TelaListagemReservas.cpp

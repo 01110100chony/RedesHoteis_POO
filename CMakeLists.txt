@@ -34,6 +34,8 @@ set(FONTES_PROJETO
     ui/TelaReserva.cpp
     ui/TelaResumoReserva.h
     ui/TelaResumoReserva.cpp
+    ui/TelaListagemReservas.h
+    ui/TelaListagemReservas.cpp
 )
 
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})
