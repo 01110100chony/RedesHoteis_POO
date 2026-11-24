@@ -12,7 +12,8 @@ HEADERS += \
     model/Cliente.h \
     model/TiposHotel.h \
     model/EstrategiaDesconto.h \
-    model/Reserva.h
+    model/Reserva.h \
+    core/GerenciadorReservas.h
 
 SOURCES += \
     main.cpp \
@@ -21,4 +22,5 @@ SOURCES += \
     model/Cliente.cpp \
     model/TiposHotel.cpp \
     model/EstrategiaDesconto.cpp \
-    model/Reserva.cpp
+    model/Reserva.cpp \
+    core/GerenciadorReservas.cpp
