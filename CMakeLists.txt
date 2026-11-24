@@ -24,6 +24,8 @@ set(FONTES_PROJETO
     model/Reserva.cpp
     core/GerenciadorReservas.h
     core/GerenciadorReservas.cpp
+    core/PersistenciaArquivo.h
+    core/PersistenciaArquivo.cpp
 )
 
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})

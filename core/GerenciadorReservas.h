@@ -48,9 +48,13 @@ private:
     QList<Cliente> clientes;
     QList<Reserva> reservas;
     int proximoId = 1;
+    QString diretorioDados;
 
     GerenciadorReservas();
     void carregarAtendentesPadrao();
+    void carregarDadosDoDisco();
+    void salvarClientesNoDisco() const;
+    void salvarReservasNoDisco() const;
     void ordenarReservasPorCheckIn();
     QList<Reserva> cancelarPendentesConflitantes(int idIgnorar,
                                                  Unidade unidade,
@@ -63,6 +67,13 @@ public:
     GerenciadorReservas& operator=(const GerenciadorReservas&) = delete;
 
     static GerenciadorReservas& getInstance();
+
+    // Configuracao de persistencia em disco
+    void configurarDiretorioDados(const QString& novoDiretorio);
+    void resetarParaTestes(const QString& diretorioTeste);
+    QString getCaminhoArquivoClientes() const;
+    QString getCaminhoArquivoReservas() const;
+    bool exportarReservas(const QString& caminhoArquivo) const;
 
     // Autenticacao
     bool autenticar(const QString& usuario, const QString& senha);

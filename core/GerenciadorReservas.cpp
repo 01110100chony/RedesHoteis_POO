@@ -1,9 +1,20 @@
 #include "GerenciadorReservas.h"
+#include "PersistenciaArquivo.h"
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
 #include <algorithm>
 
 GerenciadorReservas::GerenciadorReservas()
 {
     carregarAtendentesPadrao();
+
+    if (QCoreApplication::instance()) {
+        diretorioDados = QCoreApplication::applicationDirPath() + "/dados";
+    } else {
+        diretorioDados = QDir::currentPath() + "/dados";
+    }
+    carregarDadosDoDisco();
 }
 
 GerenciadorReservas& GerenciadorReservas::getInstance()
@@ -19,6 +30,68 @@ void GerenciadorReservas::carregarAtendentesPadrao()
     atendentes.append(Atendente("Atendente 2", "atendente2", "senha2"));
     atendentes.append(Atendente("Atendente 3", "atendente3", "senha3"));
     atendentes.append(Atendente("Atendente 4", "atendente4", "senha4"));
+}
+
+void GerenciadorReservas::carregarDadosDoDisco()
+{
+    clientes = PersistenciaArquivo::carregarClientesCsv(getCaminhoArquivoClientes());
+    reservas = PersistenciaArquivo::carregarReservasCsv(getCaminhoArquivoReservas());
+
+    int maiorId = 0;
+    for (const Reserva& r : reservas) {
+        if (r.getId() > maiorId) {
+            maiorId = r.getId();
+        }
+    }
+    proximoId = maiorId + 1;
+    ordenarReservasPorCheckIn();
+}
+
+void GerenciadorReservas::salvarClientesNoDisco() const
+{
+    PersistenciaArquivo::salvarClientesCsv(getCaminhoArquivoClientes(), clientes);
+}
+
+void GerenciadorReservas::salvarReservasNoDisco() const
+{
+    PersistenciaArquivo::salvarReservasCsv(getCaminhoArquivoReservas(), reservas);
+}
+
+void GerenciadorReservas::configurarDiretorioDados(const QString& novoDiretorio)
+{
+    diretorioDados = novoDiretorio;
+    carregarDadosDoDisco();
+}
+
+void GerenciadorReservas::resetarParaTestes(const QString& diretorioTeste)
+{
+    diretorioDados = diretorioTeste;
+    atendenteLogado = nullptr;
+    clientes.clear();
+    reservas.clear();
+    proximoId = 1;
+
+    QDir().mkpath(diretorioDados);
+    QFile::remove(getCaminhoArquivoClientes());
+    QFile::remove(getCaminhoArquivoReservas());
+}
+
+QString GerenciadorReservas::getCaminhoArquivoClientes() const
+{
+    return QDir(diretorioDados).filePath("clientes.csv");
+}
+
+QString GerenciadorReservas::getCaminhoArquivoReservas() const
+{
+    return QDir(diretorioDados).filePath("reservas.csv");
+}
+
+bool GerenciadorReservas::exportarReservas(const QString& caminhoArquivo) const
+{
+    if (caminhoArquivo.endsWith(".txt", Qt::CaseInsensitive)) {
+        return PersistenciaArquivo::exportarReservasTxt(caminhoArquivo, reservas);
+    }
+    return PersistenciaArquivo::salvarReservasCsv(caminhoArquivo, reservas);
 }
 
 bool GerenciadorReservas::autenticar(const QString& usuario, const QString& senha)
@@ -73,10 +146,12 @@ void GerenciadorReservas::cadastrarOuAtualizarCliente(const Cliente& cliente)
     for (Cliente& existente : clientes) {
         if (existente.getCpfNumerico() == cpfLimpo) {
             existente.setNome(cliente.getNome());
+            salvarClientesNoDisco();
             return;
         }
     }
     clientes.append(cliente);
+    salvarClientesNoDisco();
 }
 
 bool GerenciadorReservas::periodoDentroDaJanela(const QDate& checkIn, int numDiarias, QString* motivo) const
@@ -271,6 +346,7 @@ ResultadoOperacaoReserva GerenciadorReservas::criarReserva(const QString& nomeCl
     }
 
     ordenarReservasPorCheckIn();
+    salvarReservasNoDisco();
 
     res.sucesso = true;
     res.idReserva = novoId;
@@ -327,6 +403,7 @@ ResultadoOperacaoReserva GerenciadorReservas::confirmarPagamento(int idReserva)
                                                            alvo->getTipoQuarto(),
                                                            alvo->getDataCheckIn(),
                                                            alvo->getNumDiarias());
+    salvarReservasNoDisco();
 
     res.sucesso = true;
     res.idReserva = alvo->getId();
@@ -345,6 +422,7 @@ ResultadoOperacaoReserva GerenciadorReservas::cancelarReserva(int idReserva)
                 return res;
             }
             r.setStatus(StatusReserva::Cancelada);
+            salvarReservasNoDisco();
             res.sucesso = true;
             res.idReserva = idReserva;
             res.mensagem = QString("Reserva #%1 cancelada.").arg(idReserva);
