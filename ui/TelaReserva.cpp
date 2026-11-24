@@ -16,11 +16,11 @@ TelaReserva::TelaReserva(QWidget* parent)
     : QDialog(parent)
 {
     setWindowTitle("Consulta de Disponibilidade e Reserva - Hotéis Paradise");
-    setMinimumSize(720, 660);
+    setMinimumSize(740, 710);
 
     auto* layoutPrincipal = new QVBoxLayout(this);
     layoutPrincipal->setContentsMargins(20, 18, 20, 18);
-    layoutPrincipal->setSpacing(12);
+    layoutPrincipal->setSpacing(14);
 
     auto* lblTitulo = new QLabel("Consulta de Disponibilidade e Realização de Reserva", this);
     lblTitulo->setObjectName("tituloPrincipal");
@@ -29,7 +29,8 @@ TelaReserva::TelaReserva(QWidget* parent)
     // 1. Grupo de consulta de disponibilidade
     auto* grupoPeriodo = new QGroupBox("1. Período e Acomodação", this);
     auto* gridPeriodo = new QGridLayout(grupoPeriodo);
-    gridPeriodo->setSpacing(10);
+    gridPeriodo->setHorizontalSpacing(12);
+    gridPeriodo->setVerticalSpacing(12);
 
     cmbUnidade = new QComboBox(grupoPeriodo);
     for (Unidade u : InfoHotel::todasUnidades()) {
@@ -89,7 +90,8 @@ TelaReserva::TelaReserva(QWidget* parent)
     // 2. Grupo de dados do cliente e desconto
     auto* grupoCliente = new QGroupBox("2. Dados do Cliente e Política de Desconto", this);
     auto* formCliente = new QFormLayout(grupoCliente);
-    formCliente->setSpacing(10);
+    formCliente->setHorizontalSpacing(12);
+    formCliente->setVerticalSpacing(12);
 
     cmbClientesCadastrados = new QComboBox(grupoCliente);
     carregarClientesNoCombo();
@@ -121,7 +123,8 @@ TelaReserva::TelaReserva(QWidget* parent)
     // 3. Previa dos valores
     auto* grupoValores = new QGroupBox("3. Prévia dos Valores", this);
     auto* gridValores = new QGridLayout(grupoValores);
-    gridValores->setSpacing(8);
+    gridValores->setHorizontalSpacing(12);
+    gridValores->setVerticalSpacing(10);
 
     lblValorBruto = new QLabel(grupoValores);
     lblValorDesconto = new QLabel(grupoValores);
