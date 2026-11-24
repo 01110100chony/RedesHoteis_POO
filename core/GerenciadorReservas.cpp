@@ -1,4 +1,5 @@
 #include "GerenciadorReservas.h"
+#include <algorithm>
 
 GerenciadorReservas::GerenciadorReservas()
 {
@@ -160,4 +161,212 @@ ResultadoDisponibilidade GerenciadorReservas::consultarDisponibilidade(Unidade u
     }
 
     return res;
+}
+
+void GerenciadorReservas::ordenarReservasPorCheckIn()
+{
+    std::sort(reservas.begin(), reservas.end(), [](const Reserva& a, const Reserva& b) {
+        if (a.getDataCheckIn() != b.getDataCheckIn()) {
+            return a.getDataCheckIn() < b.getDataCheckIn();
+        }
+        return a.getId() < b.getId();
+    });
+}
+
+QList<Reserva> GerenciadorReservas::cancelarPendentesConflitantes(int idIgnorar,
+                                                                  Unidade unidade,
+                                                                  TipoQuarto quarto,
+                                                                  const QDate& checkIn,
+                                                                  int numDiarias)
+{
+    QList<Reserva> canceladas;
+    for (Reserva& r : reservas) {
+        if (r.getId() == idIgnorar || r.getStatus() != StatusReserva::Pendente) {
+            continue;
+        }
+        if (r.conflitaPeriodo(unidade, quarto, checkIn, numDiarias)) {
+            r.setStatus(StatusReserva::Cancelada);
+            canceladas.append(r);
+        }
+    }
+    return canceladas;
+}
+
+CalculoReserva GerenciadorReservas::calcularValores(TipoQuarto quarto,
+                                                    int numDiarias,
+                                                    const EstrategiaDesconto& estrategia) const
+{
+    CalculoReserva calc;
+    calc.valorDiaria = InfoHotel::valorDiaria(quarto);
+    calc.valorBruto = calc.valorDiaria * numDiarias;
+    calc.percentualDesconto = estrategia.getPercentual();
+    calc.valorDesconto = estrategia.calcularDesconto(calc.valorBruto);
+    calc.valorTotal = calc.valorBruto - calc.valorDesconto;
+    calc.valorEntrada = calc.valorTotal / 3.0;
+    calc.nomePolitica = estrategia.getNome();
+    return calc;
+}
+
+ResultadoOperacaoReserva GerenciadorReservas::criarReserva(const QString& nomeCliente,
+                                                           const QString& cpfCliente,
+                                                           Unidade unidade,
+                                                           TipoQuarto quarto,
+                                                           const QDate& checkIn,
+                                                           int numDiarias,
+                                                           const EstrategiaDesconto& estrategia,
+                                                           bool pagamentoConfirmado)
+{
+    ResultadoOperacaoReserva res;
+
+    if (!temAtendenteLogado()) {
+        res.mensagem = "Nenhum atendente autenticado no sistema.";
+        return res;
+    }
+
+    QString nomeLimpo = nomeCliente.trimmed();
+    if (nomeLimpo.isEmpty()) {
+        res.mensagem = "Informe o nome completo do cliente.";
+        return res;
+    }
+
+    if (!Cliente::validarCpf(cpfCliente)) {
+        res.mensagem = "CPF inválido. Informe 11 dígitos numéricos válidos.";
+        return res;
+    }
+
+    ResultadoDisponibilidade disp = consultarDisponibilidade(unidade, quarto, checkIn, numDiarias);
+    if (!disp.disponivel) {
+        res.mensagem = disp.mensagem;
+        return res;
+    }
+
+    Cliente cliente(nomeLimpo, cpfCliente);
+    cadastrarOuAtualizarCliente(cliente);
+
+    CalculoReserva calc = calcularValores(quarto, numDiarias, estrategia);
+    StatusReserva statusInicial = pagamentoConfirmado ? StatusReserva::Confirmada : StatusReserva::Pendente;
+
+    int novoId = proximoId++;
+    Reserva nova(novoId,
+                 atendenteLogado->getUsuario(),
+                 atendenteLogado->getNome(),
+                 cliente,
+                 unidade,
+                 quarto,
+                 checkIn,
+                 numDiarias,
+                 calc.nomePolitica,
+                 calc.percentualDesconto,
+                 calc.valorDiaria,
+                 calc.valorBruto,
+                 calc.valorDesconto,
+                 calc.valorTotal,
+                 calc.valorEntrada,
+                 statusInicial);
+
+    reservas.append(nova);
+
+    if (pagamentoConfirmado) {
+        res.reservasCanceladas = cancelarPendentesConflitantes(novoId, unidade, quarto, checkIn, numDiarias);
+    }
+
+    ordenarReservasPorCheckIn();
+
+    res.sucesso = true;
+    res.idReserva = novoId;
+    res.mensagem = pagamentoConfirmado
+                       ? QString("Reserva #%1 registrada e confirmada com sucesso.").arg(novoId)
+                       : QString("Reserva #%1 registrada como pendente de confirmação.").arg(novoId);
+    return res;
+}
+
+ResultadoOperacaoReserva GerenciadorReservas::confirmarPagamento(int idReserva)
+{
+    ResultadoOperacaoReserva res;
+
+    Reserva* alvo = nullptr;
+    for (Reserva& r : reservas) {
+        if (r.getId() == idReserva) {
+            alvo = &r;
+            break;
+        }
+    }
+
+    if (!alvo) {
+        res.mensagem = "Reserva não encontrada.";
+        return res;
+    }
+
+    if (alvo->getStatus() == StatusReserva::Confirmada) {
+        res.mensagem = "Esta reserva já está confirmada.";
+        return res;
+    }
+    if (alvo->getStatus() == StatusReserva::Cancelada) {
+        res.mensagem = "Não é possível confirmar uma reserva cancelada.";
+        return res;
+    }
+
+    // Garante que nenhuma outra reserva confirmada ocupa o mesmo periodo
+    for (const Reserva& outra : reservas) {
+        if (outra.getId() == alvo->getId() || outra.getStatus() != StatusReserva::Confirmada) {
+            continue;
+        }
+        if (outra.conflitaPeriodo(alvo->getUnidade(),
+                                  alvo->getTipoQuarto(),
+                                  alvo->getDataCheckIn(),
+                                  alvo->getNumDiarias())) {
+            res.mensagem = QString("Conflito: a reserva confirmada #%1 já ocupa esse quarto no período.")
+                               .arg(outra.getId());
+            return res;
+        }
+    }
+
+    alvo->setStatus(StatusReserva::Confirmada);
+    res.reservasCanceladas = cancelarPendentesConflitantes(alvo->getId(),
+                                                           alvo->getUnidade(),
+                                                           alvo->getTipoQuarto(),
+                                                           alvo->getDataCheckIn(),
+                                                           alvo->getNumDiarias());
+
+    res.sucesso = true;
+    res.idReserva = alvo->getId();
+    res.mensagem = QString("Pagamento da reserva #%1 confirmado!").arg(alvo->getId());
+    return res;
+}
+
+ResultadoOperacaoReserva GerenciadorReservas::cancelarReserva(int idReserva)
+{
+    ResultadoOperacaoReserva res;
+
+    for (Reserva& r : reservas) {
+        if (r.getId() == idReserva) {
+            if (r.getStatus() == StatusReserva::Cancelada) {
+                res.mensagem = "Esta reserva já está cancelada.";
+                return res;
+            }
+            r.setStatus(StatusReserva::Cancelada);
+            res.sucesso = true;
+            res.idReserva = idReserva;
+            res.mensagem = QString("Reserva #%1 cancelada.").arg(idReserva);
+            return res;
+        }
+    }
+
+    res.mensagem = "Reserva não encontrada.";
+    return res;
+}
+
+QList<Reserva> GerenciadorReservas::listarReservasOrdenadas() const
+{
+    return reservas;
+}
+
+std::optional<Reserva> GerenciadorReservas::buscarReservaPorId(int idReserva) const
+{
+    for (const Reserva& r : reservas) {
+        if (r.getId() == idReserva) {
+            return r;
+        }
+    }
+    return std::nullopt;
 }
