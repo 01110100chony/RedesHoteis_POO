@@ -16,6 +16,10 @@ set(FONTES_PROJETO
     model/Atendente.cpp
     model/Cliente.h
     model/Cliente.cpp
+    model/TiposHotel.h
+    model/TiposHotel.cpp
+    model/Reserva.h
+    model/Reserva.cpp
 )
 
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})

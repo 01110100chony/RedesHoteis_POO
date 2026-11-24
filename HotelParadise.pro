@@ -9,10 +9,14 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     model/Pessoa.h \
     model/Atendente.h \
-    model/Cliente.h
+    model/Cliente.h \
+    model/TiposHotel.h \
+    model/Reserva.h
 
 SOURCES += \
     main.cpp \
     model/Pessoa.cpp \
     model/Atendente.cpp \
-    model/Cliente.cpp
+    model/Cliente.cpp \
+    model/TiposHotel.cpp \
+    model/Reserva.cpp
