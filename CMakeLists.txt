@@ -45,6 +45,7 @@ set(FONTES_PROJETO
 add_executable(HotelParadise WIN32 ${FONTES_PROJETO})
 target_include_directories(HotelParadise PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(HotelParadise PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+install(TARGETS HotelParadise RUNTIME DESTINATION bin)
 
 add_executable(teste_regras tests/teste_regras.cpp ${FONTES_DOMINIO})
 target_include_directories(teste_regras PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

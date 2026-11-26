@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Hotel Paradise
+Comment=Sistema de reservas da Rede de Hotéis Paradise
+Exec=HotelParadise
+Icon=hotelparadise
+Categories=Office;
+Terminal=false

@@ -103,6 +103,9 @@ static QString estiloPadraoSistema()
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setOrganizationName("HotelParadise");
+    app.setApplicationName("HotelParadise");
+    app.setApplicationDisplayName("Hotel Paradise");
     app.setStyle("Fusion");
     app.setStyleSheet(estiloPadraoSistema());
 

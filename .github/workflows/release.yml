@@ -1,0 +1,95 @@
+name: Build and publish desktop releases
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows 11 x64 portable ZIP
+    runs-on: windows-latest
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf input
+
+      - uses: actions/checkout@v7
+
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-qt6-base
+
+      - name: Build and bundle Qt and MinGW runtimes
+        shell: pwsh
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: .\scripts\package-windows.ps1
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: HotelParadise-Windows-x64
+          path: dist/HotelParadise-Windows-x64.zip
+          if-no-files-found: error
+
+  ubuntu:
+    name: Ubuntu 22.04+ x86_64 AppImage
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Qt build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes cmake ninja-build qt6-base-dev qt6-base-dev-tools
+
+      - name: Download pinned linuxdeploy tools
+        run: |
+          curl --fail --location --retry 3 \
+            --output linuxdeploy-x86_64.AppImage \
+            https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20251107-1/linuxdeploy-x86_64.AppImage
+          curl --fail --location --retry 3 \
+            --output linuxdeploy-plugin-qt-x86_64.AppImage \
+            https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20250213-1/linuxdeploy-plugin-qt-x86_64.AppImage
+
+      - name: Build and bundle Qt runtime
+        env:
+          LINUXDEPLOY: ${{ github.workspace }}/linuxdeploy-x86_64.AppImage
+          LINUXDEPLOY_PLUGIN_QT: ${{ github.workspace }}/linuxdeploy-plugin-qt-x86_64.AppImage
+          QMAKE: /usr/bin/qmake6
+        run: bash scripts/package-ubuntu-appimage.sh
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: HotelParadise-Ubuntu-x86_64
+          path: dist/HotelParadise-Ubuntu-x86_64.AppImage
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, ubuntu]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes --title "Hotel Paradise $GITHUB_REF_NAME"

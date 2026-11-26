@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QStandardPaths>
 #include <algorithm>
 
 GerenciadorReservas::GerenciadorReservas()
@@ -10,7 +11,23 @@ GerenciadorReservas::GerenciadorReservas()
     carregarAtendentesPadrao();
 
     if (QCoreApplication::instance()) {
-        diretorioDados = QCoreApplication::applicationDirPath() + "/dados";
+        diretorioDados = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        if (diretorioDados.isEmpty()) {
+            diretorioDados = QCoreApplication::applicationDirPath() + "/dados";
+        } else {
+            const QDir dadosAntigos(QDir(QCoreApplication::applicationDirPath()).filePath("dados"));
+            const QDir dadosDoUsuario(diretorioDados);
+            if (dadosAntigos.absolutePath() != dadosDoUsuario.absolutePath()) {
+                for (const QString& nomeArquivo : {QStringLiteral("clientes.csv"), QStringLiteral("reservas.csv")}) {
+                    const QString arquivoAntigo = dadosAntigos.filePath(nomeArquivo);
+                    const QString arquivoNovo = dadosDoUsuario.filePath(nomeArquivo);
+                    if (QFile::exists(arquivoAntigo) && !QFile::exists(arquivoNovo)) {
+                        QDir().mkpath(diretorioDados);
+                        QFile::copy(arquivoAntigo, arquivoNovo);
+                    }
+                }
+            }
+        }
     } else {
         diretorioDados = QDir::currentPath() + "/dados";
     }
