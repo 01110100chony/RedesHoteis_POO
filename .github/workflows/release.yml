@@ -51,7 +51,7 @@ jobs:
       - name: Install Qt build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes cmake ninja-build qt6-base-dev qt6-base-dev-tools
+          sudo apt-get install --yes cmake ninja-build libgl-dev qt6-base-dev qt6-base-dev-tools
 
       - name: Download pinned linuxdeploy tools
         run: |
